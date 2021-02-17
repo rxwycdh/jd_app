@@ -1,0 +1,6 @@
+@mixin ellipsis {
+  // 文字省略号处理
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
