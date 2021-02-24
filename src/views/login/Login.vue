@@ -2,72 +2,89 @@
   <div class="wrapper">
     <img class="wrapper__img" src="http://www.dell-lee.com/imgs/vue3/user.png">
     <div class="wrapper__input">
-      <input class="wrapper__input__content" v-model="data.username" placeholder="请输入用户名"/>
+      <input class="wrapper__input__content" v-model="username" placeholder="请输入用户名"/>
     </div>
     <div class="wrapper__input">
-      <input class="wrapper__input__content" v-model="data.password" type="password" placeholder="请输入密码"/>
+      <input class="wrapper__input__content" v-model="password"
+             autocomplete="new-password"
+             type="password" placeholder="请输入密码"/>
     </div>
-    <div class="wrapper__login-button" @click="handleLogin">登录</div>
+    <div class="wrapper__login-button" @click="handleLoginClick">登录</div>
     <div class="wrapper__login__tags">
       <div class="wrapper__login__tags-link" @click="handleRegisterClick">立即注册</div>
       <div class="wrapper__login__tags__gap"></div>
       <div class="wrapper__login__tags-forget">忘记密码</div>
     </div>
-    <Toast v-if="data.showToast" :message="data.toastMessage"/>
+    <Toast v-if="show" :message="toastMessage"/>
   </div>
 </template>
 
 <script>
 import { useRouter } from 'vue-router'
-import { reactive } from 'vue'
-import { post } from '../../utils/request'
-import Toast from '../../components/Toast'
+import { reactive, toRefs } from 'vue'
 
+import { post } from '../../utils/request'
+import Toast, { useToastEffect } from '../../components/Toast'
+
+const useLoginEffect = (showToast) => {
+  const router = useRouter()
+  const data = reactive({
+    username: '',
+    password: ''
+  })
+
+  const handleLoginClick = async () => {
+    try {
+      const { username, password } = data
+      if ((username === '' || username === null || username === undefined) ||
+        (password === '' || password === null || password === undefined)) {
+        throw new Error('帐号名或密码不能为空')
+      }
+      // await 获取的是Promise里面的resolve或者reject的值
+      const result = await post('/api/user/login', {
+        username: data.username,
+        password: data.password
+      })
+
+      if (result?.errno === 0) {
+        localStorage.isLogin = true
+        await router.push({ name: 'Home' })
+      } else {
+        showToast('登录失败')
+      }
+    } catch (e) {
+      showToast(e.message)
+    }
+  }
+  const { username, password } = toRefs(data)
+
+  return {
+    username,
+    password,
+    handleLoginClick
+  }
+}
+const registerEffect = () => {
+  const router = useRouter()
+  const handleRegisterClick = () => {
+    router.push({ name: 'Register' })
+  }
+  return { handleRegisterClick }
+}
 export default {
   name: 'Login',
   components: { Toast },
   setup () {
-    const data = reactive({
-      username: '',
-      password: '',
-      showToast: false,
-      toastMessage: ''
-    })
-    const router = useRouter()
-
-    const showToast = (message) => {
-      data.showToast = true
-      data.toastMessage = message
-      setTimeout(() => {
-        data.showToast = false
-        data.toastMessage = ''
-      }, 2000)
-    }
-    const handleLogin = async () => {
-      try {
-        // await 获取的是Promise里面的resolve或者reject的值
-        const result = await post('/api/user/login', {
-          username: data.username,
-          password: data.password
-        })
-
-        if (result?.errno === 0) {
-          localStorage.isLogin = true
-          await router.push({ name: 'Home' })
-        } else {
-          showToast('登录失败')
-        }
-      } catch (e) {
-        showToast('请求失败')
-      }
-    }
-    const handleRegisterClick = () => {
-      router.push({ name: 'Register' })
-    }
+    const { show, toastMessage, showToast } = useToastEffect()
+    const { username, password, handleLoginClick } = useLoginEffect(showToast)
+    const { handleRegisterClick } = registerEffect()
     return {
-      data,
-      handleLogin,
-      handleRegisterClick
+      username,
+      password,
+      handleLoginClick,
+      handleRegisterClick,
+      show,
+      toastMessage
     }
   }
 }
@@ -122,10 +139,10 @@ export default {
     text-align: center;
     font-size: .16rem;
     margin: .32rem .4rem 0 .4rem;
-    background: #0091FF;
+    background: $btn-bgColor;
     box-shadow: 0 .04px .08rem rgba(0, 145, 255, 0.32);
     border-radius: .04rem;
-    color: white;
+    color: $bgColor;
   }
 
   &__login__tags {

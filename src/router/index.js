@@ -1,18 +1,27 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Home from '../views/home/Home'
-import Login from '../views/login/Login'
-import Register from '../views/register/Register'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    // 使用异步组件component: () => 加载的时候不会立即加载，而是点击进去才加载
+    component: () => import('../views/home/Home')
+  },
+  {
+    path: '/cartList',
+    name: 'CartList',
+    // 使用异步组件component: () => 加载的时候不会立即加载，而是点击进去才加载
+    component: () => import('../views/cartList/CartList')
+  },
+  {
+    path: '/shop/:id',
+    name: 'Shop',
+    component: () => import('../views/shop/Shop')
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login,
+    component: () => import('../views/login/Login'),
     beforeEnter (to, from, next) {
       const { isLogin } = localStorage
       isLogin ? next({ name: 'Home' }) : next()
@@ -21,7 +30,7 @@ const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: Register,
+    component: () => import('../views/register/Register'),
     beforeEnter (to, from, next) {
       const { isLogin } = localStorage
       isLogin ? next({ name: 'Home' }) : next()

@@ -73,8 +73,8 @@ export default {
 // 搜索框
 .search {
   line-height: 0.32rem;
-  background-color: #F5F5F5;
-  color: #B7B7B7;
+  background-color: $search-bgColor;
+  color: $search-fontColor;
   border-radius: 0.16rem;
 
   margin-bottom: .12rem;
