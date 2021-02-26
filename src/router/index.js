@@ -14,6 +14,18 @@ const routes = [
     component: () => import('../views/cartList/CartList')
   },
   {
+    path: '/orderList',
+    name: 'OrderList',
+    // 使用异步组件component: () => 加载的时候不会立即加载，而是点击进去才加载
+    component: () => import('../views/orderList/OrderList')
+  },
+  {
+    path: '/orderConfirmation/:id',
+    name: 'OrderConfirmation',
+    // 使用异步组件component: () => 加载的时候不会立即加载，而是点击进去才加载
+    component: () => import('../views/orderConfirmation/OrderConfirmation')
+  },
+  {
     path: '/shop/:id',
     name: 'Shop',
     component: () => import('../views/shop/Shop')

@@ -36,8 +36,8 @@ import { get } from '../../utils/request'
 import { useRoute } from 'vue-router'
 import { reactive, toRefs, ref, watchEffect } from 'vue'
 import Cart from '@/views/shop/Cart'
-import { useCommonCartEffect } from './commonCartEffect'
 import { useStore } from 'vuex'
+import { useCommonCartEffect } from '@/effects/cartEffects'
 
 const categories = [
   {
@@ -86,7 +86,7 @@ const useCurrentListEffect = (currentTab, shopId) => {
 }
 const useCartEffect = () => {
   const store = useStore()
-
+  // 没有用到shopid所依赖的currentCartList方法，不传shopid也可以
   const { changeCartItemInfo, cartList } = useCommonCartEffect()
   const changeShopName = (shopId, shopName) => {
     store.commit('changeShopName', {
